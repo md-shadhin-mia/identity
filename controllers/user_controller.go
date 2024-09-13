@@ -1,0 +1,95 @@
+package controllers
+
+import (
+	"indentity/models"
+	"indentity/services"
+	"indentity/utils"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+)
+
+type UserController struct {
+	us *services.UserService
+}
+
+func NewUserController(us *services.UserService) *UserController {
+	return &UserController{us: us}
+}
+
+type UserInput struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (uc *UserController) CreateUser(c *gin.Context) {
+	var user UserInput
+	err := c.BindJSON(&user)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	err = uc.us.CreateUser(&models.User{Username: user.Username, Email: user.Email, Password: user.Password})
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(201, user)
+}
+
+func (uc *UserController) GetUserByID(c *gin.Context) {
+	id := c.Param("id")
+
+	user, err := uc.us.GetUserByID(id)
+	if err != nil {
+		c.JSON(404, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, user)
+}
+
+func (uc *UserController) AddRoleToUser(c *gin.Context) {
+	userID := c.Param("user_id")
+
+	roleID, err := strconv.ParseUint(c.Param("role_id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	err = uc.us.AddRoleToUser(userID, uint(roleID))
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Role added to user successfully"})
+}
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (uc *UserController) SignIn(c *gin.Context) {
+	var user LoginRequest
+	err := c.BindJSON(&user)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	userFromDB, err := uc.us.GetUserByUsername(user.Username)
+	if err != nil {
+		c.JSON(404, gin.H{"error": err.Error()})
+		return
+	}
+	if !userFromDB.CheckPasswordHash(user.Password) {
+		c.JSON(401, gin.H{"error": "invalid username or password"})
+		return
+	}
+	token, err := utils.GenerateToken(userFromDB.ID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"token": token})
+}
