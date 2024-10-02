@@ -26,10 +26,10 @@ func (us *UserService) GetUserByID(id string) (*models.User, error) {
 	return &user, err
 }
 
-func (us *UserService) AddRoleToUser(userID string, roleID uint) error {
-	userRole := &models.UserRole{UserID: uuid.MustParse(userID), RoleID: roleID}
-	return us.db.Create(userRole).Error
-}
+// func (us *UserService) AddRoleToUser(userID string, roleID uint) error {
+// 	userRole := &models.UserRole{RoleID: roleID}
+// 	return us.db.Create(userRole).Error
+// }
 
 func (us *UserService) GetUserByUsername(username string) (*models.User, error) {
 	var user models.User

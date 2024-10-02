@@ -7,16 +7,17 @@ import (
 )
 
 type User struct {
-	gorm.Model
-	ID       uuid.UUID `gorm:"primary_key;"`
-	Username string    `gorm:"uniqueIndex;not null"`
-	Email    string    `gorm:"uniqueIndex;not null"`
-	Password string    `gorm:"not null" json:"-"`
-	Roles    []Role    `gorm:"many2many:user_roles;"`
+	BaseModel
+	Username string `gorm:"type:varchar(191);uniqueIndex;not null"`
+	Email    string `gorm:"type:varchar(191);uniqueIndex;not null"`
+	Password string `gorm:"type:varchar(191);not null" json:"-"`
+
+	RealmID uuid.UUID `gorm:"type:binary(16)"`
+	Realm   *Realm    `gorm:"foreignkey:RealmID;association_foreignkey:ID"`
 }
 
 type Role struct {
-	gorm.Model
+	BaseModel
 	Name string `gorm:"uniqueIndex;not null"`
 }
 
