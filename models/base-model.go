@@ -6,7 +6,7 @@ import (
 )
 
 type BaseModel struct {
-	ID uuid.UUID `gorm:"type:binary(16);primary_key;"`
+	ID uuid.UUID `gorm:"type:uuid;primary_key;"`
 }
 
 func (c *BaseModel) BeforeCreate(tx *gorm.DB) error {

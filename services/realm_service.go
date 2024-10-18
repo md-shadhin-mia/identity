@@ -17,6 +17,12 @@ func NewRealmService(db *gorm.DB) *RealmService {
 	return &RealmService{db: db}
 }
 
+func (rs *RealmService) GetAllReamls() ([]models.Realm, error) {
+	var realms []models.Realm
+	err := rs.db.Find(&realms).Error
+	return realms, err
+}
+
 func (rs *RealmService) CreateRealm(realm *models.Realm) error {
 	return rs.db.Create(realm).Error
 }

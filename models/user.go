@@ -8,12 +8,12 @@ import (
 
 type User struct {
 	BaseModel
-	Username string `gorm:"type:varchar(191);uniqueIndex;not null"`
-	Email    string `gorm:"type:varchar(191);uniqueIndex;not null"`
-	Password string `gorm:"type:varchar(191);not null" json:"-"`
+	Username string `gorm:"uniqueIndex;not null"`
+	Email    string `gorm:"uniqueIndex;not null"`
+	Password string `gorm:"not null" json:"-"`
 
-	RealmID uuid.UUID `gorm:"type:binary(16)"`
-	Realm   *Realm    `gorm:"foreignkey:RealmID;association_foreignkey:ID"`
+	RealmID uuid.UUID `gorm:"type:uuid"`
+	Realm   Realm     `gorm:"foreignKey:RealmID"`
 }
 
 type Role struct {

@@ -3,7 +3,9 @@ package main
 import (
 	"indentity/controllers"
 	"indentity/initilizer"
+	"indentity/middleware"
 	"indentity/services"
+	"indentity/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,9 +23,20 @@ func main() {
 
 	reamlService := services.NewRealmService(initilizer.DB)
 	reamlController := controllers.NewReamlController(reamlService)
+	v1.POST("/reamls", middleware.ScopeMiddleware("realm:write"), reamlController.CreateReaml)
+	v1.GET("/reamls", middleware.ScopeMiddleware("realm:read"), reamlController.GetAllReamls)
+	v1.GET("/reamls/:id", middleware.ScopeMiddleware("realm:read"), reamlController.GetReamlByID)
 
-	v1.POST("/reamls", reamlController.CreateReaml)
-	v1.GET("/reamls/:id", reamlController.GetReamlByID)
+	userService := services.NewUserService(initilizer.DB)
+	userController := controllers.NewUserController(userService)
+	v1.GET("/users", userController.GetAllUsers)
+	v1.POST("/users", userController.CreateUser)
+	v1.GET("/users/:id", userController.GetUserByID)
+	v1.POST("/signin", userController.SignIn)
+	v1.POST("/authenticate", userController.AuthenticateUser)
+
+	var reamlRoute = v1.Group(":reaml")
+	reamlRoute.Use(utils.TokenMiddleware())
 
 	// userService := services.NewUserService(initilizer.DB)
 

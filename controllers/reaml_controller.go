@@ -22,6 +22,14 @@ type ReamlInput struct {
 	Description string `json:"description" binding:"required"`
 }
 
+func (rc *ReamlController) GetAllReamls(c *gin.Context) {
+	reamls, err := rc.rs.GetAllReamls()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, reamls)
+}
 func (rc *ReamlController) CreateReaml(c *gin.Context) {
 	var reamlInput ReamlInput
 	err := c.BindJSON(&reamlInput)

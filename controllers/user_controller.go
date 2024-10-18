@@ -4,7 +4,7 @@ import (
 	"indentity/models"
 	"indentity/services"
 	"indentity/utils"
-	"strconv"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +15,16 @@ type UserController struct {
 
 func NewUserController(us *services.UserService) *UserController {
 	return &UserController{us: us}
+}
+
+func (uc *UserController) GetAllUsers(c *gin.Context) {
+	users, err := uc.us.GetAllUsers()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, users)
 }
 
 type UserInput struct {
@@ -49,21 +59,21 @@ func (uc *UserController) GetUserByID(c *gin.Context) {
 	c.JSON(200, user)
 }
 
-func (uc *UserController) AddRoleToUser(c *gin.Context) {
-	userID := c.Param("user_id")
+// func (uc *UserController) AddRoleToUser(c *gin.Context) {
+// 	userID := c.Param("user_id")
 
-	roleID, err := strconv.ParseUint(c.Param("role_id"), 10, 64)
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	err = uc.us.AddRoleToUser(userID, uint(roleID))
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(200, gin.H{"message": "Role added to user successfully"})
-}
+// 	roleID, err := strconv.ParseUint(c.Param("role_id"), 10, 64)
+// 	if err != nil {
+// 		c.JSON(400, gin.H{"error": err.Error()})
+// 		return
+// 	}
+// 	err = uc.us.AddRoleToUser(userID, uint(roleID))
+// 	if err != nil {
+// 		c.JSON(500, gin.H{"error": err.Error()})
+// 		return
+// 	}
+// 	c.JSON(200, gin.H{"message": "Role added to user successfully"})
+// }
 
 type LoginRequest struct {
 	Username string `json:"username"`
@@ -83,7 +93,7 @@ func (uc *UserController) SignIn(c *gin.Context) {
 		return
 	}
 	if !userFromDB.CheckPasswordHash(user.Password) {
-		c.JSON(401, gin.H{"error": "invalid username or password"})
+		c.JSON(401, gin.H{"error": "invalid password"})
 		return
 	}
 	token, err := utils.GenerateToken(userFromDB.ID)
@@ -92,4 +102,22 @@ func (uc *UserController) SignIn(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"token": token})
+}
+
+func (uc *UserController) AuthenticateUser(c *gin.Context) {
+	var user LoginRequest
+	err := c.BindJSON(&user)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	r, err := uc.us.AuthenticateUser(user.Username, user.Password)
+
+	if err != nil {
+		log.Println(err)
+		c.JSON(401, gin.H{"error": "invalid username or password"})
+		return
+	}
+
+	c.JSON(200, gin.H{"token": r})
 }

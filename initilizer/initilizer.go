@@ -7,6 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -35,6 +36,16 @@ func DBConnect() {
 		DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	} else if os.Getenv("DB_DRIVER") == "sqlite" {
 		DB, err = gorm.Open(sqlite.Open(fmt.Sprintf("%s.db", os.Getenv("DB_NAME"))), &gorm.Config{})
+	} else if os.Getenv("DB_DRIVER") == "postgres" {
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_USERNAME"),
+			os.Getenv("DB_PASSWORD"),
+			os.Getenv("DB_NAME"),
+			os.Getenv("DB_PORT"))
+		log.Println("dsn: ", dsn)
+		DB, err = gorm.Open(postgres.New(postgres.Config{DSN: dsn}), &gorm.Config{})
+
 	}
 
 	if DB == nil {
@@ -46,5 +57,5 @@ func DBConnect() {
 	if err = DB.Error; err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Connected to Goorm MySQL")
+	log.Println("Connected to Goorm DATABASE")
 }
