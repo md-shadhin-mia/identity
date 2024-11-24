@@ -7,8 +7,8 @@ import (
 
 type Realm struct {
 	BaseModel
-	Name        string `gorm:"not null;unique"`
-	Description string `gorm:"not null"`
+	Name        string `gorm:"not null;unique" validate:"required"`
+	Description string `gorm:"not null" validate:"required"`
 }
 
 func (r *Realm) BeforeCreate(tx *gorm.DB) error {

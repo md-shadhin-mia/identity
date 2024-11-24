@@ -3,8 +3,10 @@ package controllers
 // controllers/reaml_controller.go
 
 import (
+	"indentity/core"
 	"indentity/models"
 	"indentity/services"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,11 +20,11 @@ func NewReamlController(rs *services.RealmService) *ReamlController {
 }
 
 type ReamlInput struct {
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description" validate:"required"`
 }
 
-func (rc *ReamlController) GetAllReamls(c *gin.Context) {
+func (rc *ReamlController) GetAllReamls(c *core.Context) {
 	reamls, err := rc.rs.GetAllReamls()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -30,22 +32,24 @@ func (rc *ReamlController) GetAllReamls(c *gin.Context) {
 	}
 	c.JSON(200, reamls)
 }
-func (rc *ReamlController) CreateReaml(c *gin.Context) {
-	var reamlInput ReamlInput
-	err := c.BindJSON(&reamlInput)
+func (rc *ReamlController) CreateReaml(c *core.Context) {
+	var reamlInput models.Realm
+	err := c.BindValidateJson(&reamlInput)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		// c.JSON(400, gin.H{"error": err})
+		log.Println(err)
 		return
 	}
-	err = rc.rs.CreateRealm(&models.Realm{Name: reamlInput.Name, Description: reamlInput.Description})
+	reaml, err := rc.rs.CreateRealm(&reamlInput)
+
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(201, reamlInput)
+	c.JSON(201, reaml)
 }
 
-func (rc *ReamlController) GetReamlByID(c *gin.Context) {
+func (rc *ReamlController) GetReamlByID(c *core.Context) {
 	id := c.Param("id")
 	reaml, err := rc.rs.GetRealmByName((id))
 	if err != nil {
@@ -54,7 +58,7 @@ func (rc *ReamlController) GetReamlByID(c *gin.Context) {
 	}
 	c.JSON(200, reaml)
 }
-func (rc *ReamlController) UpdateReaml(c *gin.Context) {
+func (rc *ReamlController) UpdateReaml(c *core.Context) {
 	id := c.Param("id")
 
 	var reamlInput ReamlInput
@@ -82,7 +86,7 @@ func (rc *ReamlController) UpdateReaml(c *gin.Context) {
 	c.JSON(200, reaml)
 }
 
-func (rc *ReamlController) DeleteReaml(c *gin.Context) {
+func (rc *ReamlController) DeleteReaml(c *core.Context) {
 	id := c.Param("id")
 
 	err := rc.rs.DeleteRealm(id)

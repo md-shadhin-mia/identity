@@ -23,10 +23,10 @@ func (rs *RealmService) GetAllReamls() ([]models.Realm, error) {
 	return realms, err
 }
 
-func (rs *RealmService) CreateRealm(realm *models.Realm) error {
-	return rs.db.Create(realm).Error
+func (rs *RealmService) CreateRealm(realm *models.Realm) (*models.Realm, error) {
+	result := rs.db.Create(realm)
+	return realm, result.Error
 }
-
 func (rs *RealmService) GetRealmByName(name string) (*models.Realm, error) {
 	var realm models.Realm
 	err := rs.db.First(&realm, "name = ?", name).Error

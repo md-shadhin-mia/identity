@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"indentity/models"
+	"indentity/utils"
 	"os"
 	"time"
 
@@ -16,7 +17,7 @@ type AuthenticationService struct {
 }
 
 var secret = []byte("secret")
-var AllScopes = []string{"reamls:read", "reamls:write"}
+var AllScopes = []string{utils.RealmWrite, utils.RealmRead, utils.RealmUpdate, utils.RealmDelete, utils.ClientWrite, utils.ClientRead, utils.ClientUpdate, utils.ClientDelete}
 
 func NewAuthenticationService(db *gorm.DB) *AuthenticationService {
 	secret = []byte(os.Getenv("JWT_SECRET"))

@@ -37,6 +37,7 @@ func DBConnect() {
 	} else if os.Getenv("DB_DRIVER") == "sqlite" {
 		DB, err = gorm.Open(sqlite.Open(fmt.Sprintf("%s.db", os.Getenv("DB_NAME"))), &gorm.Config{})
 	} else if os.Getenv("DB_DRIVER") == "postgres" {
+
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 			os.Getenv("DB_HOST"),
 			os.Getenv("DB_USERNAME"),

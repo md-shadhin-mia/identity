@@ -2,6 +2,7 @@
 package controllers
 
 import (
+	"indentity/core"
 	"indentity/models"
 	"indentity/services"
 
@@ -21,7 +22,7 @@ func NewClientController(cs *services.ClientService) *ClientController {
 	return &ClientController{cs: cs}
 }
 
-func (cc *ClientController) CreateClient(c *gin.Context) {
+func (cc *ClientController) CreateClient(c *core.Context) {
 	var clientInput ClientInput
 	err := c.BindJSON(&clientInput)
 	if err != nil {
@@ -43,7 +44,7 @@ func (cc *ClientController) CreateClient(c *gin.Context) {
 	c.JSON(201, client)
 }
 
-func (cc *ClientController) GetClientByID(c *gin.Context) {
+func (cc *ClientController) GetClientByID(c *core.Context) {
 	id := c.Param("id")
 
 	client, err := cc.cs.GetClientByID(id)
@@ -55,7 +56,7 @@ func (cc *ClientController) GetClientByID(c *gin.Context) {
 	c.JSON(200, client)
 }
 
-func (cc *ClientController) GetClientByName(c *gin.Context) {
+func (cc *ClientController) GetClientByName(c *core.Context) {
 	name := c.Param("name")
 
 	client, err := cc.cs.GetClientByName(name)
@@ -67,7 +68,7 @@ func (cc *ClientController) GetClientByName(c *gin.Context) {
 	c.JSON(200, client)
 }
 
-func (cc *ClientController) UpdateClient(c *gin.Context) {
+func (cc *ClientController) UpdateClient(c *core.Context) {
 	id := c.Param("id")
 
 	var clientInput ClientInput
@@ -95,7 +96,7 @@ func (cc *ClientController) UpdateClient(c *gin.Context) {
 	c.JSON(200, client)
 }
 
-func (cc *ClientController) DeleteClient(c *gin.Context) {
+func (cc *ClientController) DeleteClient(c *core.Context) {
 	id := c.Param("id")
 
 	err := cc.cs.DeleteClient(id)

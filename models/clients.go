@@ -9,8 +9,8 @@ import (
 
 type Client struct {
 	BaseModel
-	Name   string `gorm:"uniqueIndex;not null"`
-	Secret string `gorm:"not null"`
+	Name   string `gorm:"uniqueIndex;not null" `
+	Secret string `gorm:"not null" `
 }
 
 func (c *Client) BeforeCreate(tx *gorm.DB) error {
