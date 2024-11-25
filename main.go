@@ -24,6 +24,7 @@ func serve() {
 	r := core.NewEngine()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.LoadHTMLGlob("assets/templates/*.html")
 	var v1 = r.Group("/" + os.Getenv("Name"))
 
 	reamlService := services.NewRealmService(initilizer.DB)
@@ -49,6 +50,10 @@ func serve() {
 	v1.GET("/users/:id", userController.GetUserByID)
 	v1.POST("/signin", userController.SignIn)
 	v1.POST("/authenticate", userController.AuthenticateUser)
+	authorizeService := services.NewAuthorizeService(initilizer.DB)
+	authorizeController := controllers.NewAuthorizeController(authorizeService)
+	v1.GET("/authorize", authorizeController.Authorize)
+	v1.GET("/token", authorizeController.TokenAuthorize)
 
 	var reamlRoute = v1.Group(":reaml")
 	reamlRoute.Use(utils.TokenMiddleware())

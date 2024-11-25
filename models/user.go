@@ -39,3 +39,8 @@ func (u *User) SetPassword(password string) error {
 	u.Password = string(hashedPassword)
 	return nil
 }
+
+func (u *User) HasRole(role string) bool {
+
+	return true
+}
