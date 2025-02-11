@@ -8,9 +8,10 @@ import (
 
 type User struct {
 	BaseModel
-	Username string `gorm:"uniqueIndex;not null"`
-	Email    string `gorm:"uniqueIndex;not null"`
-	Password string `gorm:"not null" json:"-"`
+	Username    string     `gorm:"uniqueIndex;not null"`
+	Email       string     `gorm:"uniqueIndex;not null"`
+	Password    string     `gorm:"not null" json:"-"`
+	ClientRoles []UserRole `gorm:"foreignKey:UserID"`
 
 	RealmID uuid.UUID `gorm:"type:uuid"`
 	Realm   Realm     `gorm:"foreignKey:RealmID"`
